@@ -3,6 +3,7 @@ package com.whdev.tokendemo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.whdev.tokendemo.mapper.MenuMapper;
 import com.whdev.tokendemo.mapper.UserMapper;
 import domain.LoginUser;
 import domain.User;
@@ -12,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -20,6 +24,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private MenuMapper menuMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -35,9 +41,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new RuntimeException("用户名或者密码错误123");
         }
 
-        //TODO 根据用户查询权限信息 添加到LoginUser中
+        List<String> list = menuMapper.selectPermsByUserId(user.getId());
+//        List<String> list = new ArrayList<>(Arrays.asList("test", "admin"));
 
         //如果找到对应用户，封装成UserDetails对象返回
-        return new LoginUser(user);
+        return new LoginUser(user, list);
     }
 }
